@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 Telemetry & Management System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <span class="f1-red">F1</span> MANAGER
+    </div>
+    <nav>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#drivers">Pilotos</a>
+      <button class="btn-primary" onclick="openModal()">+ Novo Piloto</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- Next Race Hero Banner -->
+    <section class="race-card" id="dashboard">
+      <div class="race-info">
+        <span class="badge">Próxima Etapa</span>
+        <h2>GRANDE PRÊMIO DE MONACO</h2>
+        <p class="circuit-detail">Monte Carlo • Circuit de Monaco</p>
+      </div>
+      <div class="telemetry">
+        <div class="stat">
+          <span class="label">VOLTAS</span>
+          <span class="value">78</span>
+        </div>
+        <div class="stat">
+          <span class="label">RECORD DA PISTA</span>
+          <span class="value red-text">1:12.909</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid / Table Section -->
+    <section class="table-section" id="drivers">
+      <div class="table-header">
+        <h3>Grid de Pilotos</h3>
+        <span class="status-live"><span class="dot"></span> Sistema Ativo</span>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>NO.</th>
+              <th>PILOTO</th>
+              <th>NACIONALIDADE</th>
+              <th>EQUIPE</th>
+              <th>AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody id="drivers-list">
+            <!-- Dados dinâmicos do backend preenchidos pelo script.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Cadastro de Piloto -->
+  <div class="modal-overlay" id="driverModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Cadastrar Novo Piloto</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="driverForm">
+        <div class="form-group">
+          <label for="first_name">Nome</label>
+          <input type="text" id="first_name" required placeholder="Ex: Max" />
+        </div>
+        <div class="form-group">
+          <label for="last_name">Sobrenome</label>
+          <input type="text" id="last_name" required placeholder="Ex: Verstappen" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="number">Número</label>
+            <input type="number" id="number" required placeholder="1" />
+          </div>
+          <div class="form-group">
+            <label for="team_id">ID da Equipe</label>
+            <input type="number" id="team_id" required placeholder="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="nationality">Nacionalidade</label>
+          <input type="text" id="nationality" required placeholder="Ex: Holandês" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar no Grid</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

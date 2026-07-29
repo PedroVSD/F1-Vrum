@@ -1,5 +1,5 @@
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -9,9 +9,9 @@ class Base(DeclarativeBase):
 class Driver(Base):
     __tablename__ = "drivers"
 
-    id = Column(Integer, primare_key=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    number = Column(Interger)
-    nationality = Column(String)
-    team_id = Column(Integer, ForeignKey=("teams.id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    first_name: Mapped[str]
+    last_name: Mapped[str]
+    number: Mapped[int]
+    nationality: Mapped[int]
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"))

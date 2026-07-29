@@ -23,6 +23,10 @@ No futuro haverá:
 - source .venv/bin/activate
 - uv run uvicorn app.main:app --reload
 - http://127.0.0.1:8000
+- Caso o comando acima falhar: uv run python -m uvicorn app.main:app --reload
+
+- Para conectar em um provedor de API como insomina:
+http://127.0.0.1:8000/openapi.json
 
 # Arquitetura planejada(pode mudar)
 
@@ -38,10 +42,10 @@ No futuro haverá:
 - DELETE /driver{id}
 
 ## Arquitetura
-routers/
-services/
-repositories/
-models/
-schemas/
-database/
-core/
+- routers/
+- services/
+- repositories/
+- models/
+- schemas/
+- database/
+- core/

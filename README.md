@@ -28,6 +28,9 @@ No futuro haverá:
 - Para conectar em um provedor de API como insomina:
 http://127.0.0.1:8000/openapi.json
 
+- Para acessar o swagger
+http://127.0.0.1:8000/docs
+
 # Arquitetura planejada(pode mudar)
 
 ## Endpoints

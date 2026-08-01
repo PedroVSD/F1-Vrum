@@ -1,14 +1,12 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
-
-class Base(DeclarativeBase):
-    pass
+from .base import Base
 
 
 class Circuit(Base):
     __tablename__ = "circuit"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     name: Mapped[str]
     country: Mapped[str]
     city: Mapped[str]

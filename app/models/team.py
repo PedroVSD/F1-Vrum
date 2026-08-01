@@ -1,18 +1,17 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-
-class Base(DeclarativeBase):
-    pass
+from .base import Base
 
 
 class Team(Base):
-    __tablename__ = "team"
+    __tablename__ = "teams"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    drivers: Mapped[str]
     points: Mapped[int]
     boss: Mapped[str]
     engine: Mapped[str]
     car: Mapped[str]
     country: Mapped[str]
+
+    drivers: Mapped[list["Driver"]] = relationship(back_populates="team")

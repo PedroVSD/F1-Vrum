@@ -1,5 +1,4 @@
-from sqlalchemy import Integer
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -9,5 +8,5 @@ class Base(DeclarativeBase):
 class Season(Base):
     __tablename__ = "season"
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    year: Mapped[int]

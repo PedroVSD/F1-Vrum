@@ -1,5 +1,4 @@
-from sqlalchemy import Double, Integer, String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -9,8 +8,8 @@ class Base(DeclarativeBase):
 class Circuit(Base):
     __tablename__ = "circuit"
 
-    id = Column(Integer, primare_key=True)
-    name = Column(String)
-    country = Column(String)
-    city = Column(String)
-    length_km = Column(Double)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    country: Mapped[str]
+    city: Mapped[str]
+    length_km: Mapped[float]

@@ -1,5 +1,4 @@
-from sqlalchemy import Integer, String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -9,11 +8,11 @@ class Base(DeclarativeBase):
 class Team(Base):
     __tablename__ = "team"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    drivers = Column(String)
-    points = Column(Integer)
-    boss = Column(String)
-    engine = Column(String)
-    car = Column(String)
-    country = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    drivers: Mapped[str]
+    points: Mapped[int]
+    boss: Mapped[str]
+    engine: Mapped[str]
+    car: Mapped[str]
+    country: Mapped[str]

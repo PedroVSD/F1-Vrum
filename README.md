@@ -1,5 +1,8 @@
 # RaceHub é uma API REST desenvolvida em FastAPI para disponibilizar informações sobre a Fórmula 1.
 
+## Atualizando dados sobre as corridas:
+Puxas os dados de um site atualizado (ESPN por exemplo)-> aqui fazer um web scraping, ou puxar de alguma API que contenha os dados
+
 A API permitirá consultar:
 
 - Pilotos

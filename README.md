@@ -20,6 +20,16 @@ No futuro haverá:
 - Estatísticas
 - Dashboard
 
+# Stack
+
+* FastAPI
+* PostgreSQL
+* SQLAlchemy2.0
+* Alembic para migrations
+* Pydantic para validação
+* Docker Compose
+* Uvicorn
+
 # Rodando o projeto
 
 - uv venv

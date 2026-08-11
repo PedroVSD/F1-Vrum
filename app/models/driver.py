@@ -1,5 +1,6 @@
 from datetime import date
 
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -13,7 +14,7 @@ class Driver(Base):
     last_name: Mapped[str]
     number: Mapped[int] = mapped_column(unique=True)
     nationality: Mapped[str]
-
     birth_date: Mapped[date]
 
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"))
     team: Mapped["Team"] = relationship(back_populates="drivers")

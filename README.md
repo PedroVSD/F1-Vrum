@@ -1,9 +1,6 @@
-# RaceHub é uma API REST desenvolvida em FastAPI para disponibilizar informações sobre a Fórmula 1.
+# RaceHub é uma plataforma de dados, com uma API servindo os dados desenvolvida em FastAPI para disponibilizar informações sobre a Fórmula 1🏎️.
 
-## Atualizando dados sobre as corridas:
-Puxas os dados de um site atualizado (ESPN por exemplo)-> aqui fazer um web scraping, ou puxar de alguma API que contenha os dados
-
-A API permitirá consultar:
+De início a plataforma permitirá consultar:
 
 - Pilotos
 - Equipes
@@ -12,23 +9,33 @@ A API permitirá consultar:
 - Temporadas
 - Resultados
 
-No futuro haverá:
+No futuro haverá a plataforma terá:
 
+- Testes
+- Paginação
+- Estatísticas
 - Login
 - Favoritos
+- Coleta de dados separado
+- ETL
 - Predições
-- Estatísticas
 - Dashboard
+- Variáveis de ambiente para credenciais.
+- Redis
+- Nginx
+
+## Atualizando dados sobre as corridas:
+Como ideia de atualização dos dados, como corridas, temporadas e etc. Puxar os dados de um site atualizado (ESPN por exemplo)-> fazendo um web scraping, ou puxar de alguma API que contenha os dados.
 
 # Stack
 
-* FastAPI
-* PostgreSQL
-* SQLAlchemy2.0
-* Alembic para migrations
-* Pydantic para validação
-* Docker Compose
-* Uvicorn
+- FastAPI
+- PostgreSQL
+- SQLAlchemy2.0
+- Alembic
+- Pydantic
+- Docker Compose
+- Uvicorn
 
 # Rodando o projeto
 
@@ -47,6 +54,7 @@ http://127.0.0.1:8000/docs
 # Arquitetura planejada(pode mudar)
 
 ## Endpoints
+#### Escrever descrições claras nos endpoints desde o início.
 - GET /drivers
 - GET /drivers{id}
 - POST /driver
@@ -66,5 +74,6 @@ http://127.0.0.1:8000/docs
 - database/
 - core/
 
-## Adicionar
-- Testes
+# Como boas práticas:
+- Ir documentando
+- Separar responsabilidades

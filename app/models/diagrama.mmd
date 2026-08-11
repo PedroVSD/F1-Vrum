@@ -52,7 +52,8 @@ classDiagram
 
     class PitStop {
         +int id
-        +duration Interval
+        +duration interval
+        +int result_id
     }
 
     Season "1" --> "0..*" Race : contém
@@ -60,4 +61,4 @@ classDiagram
     Race "1" --> "0..*" Result : gera
     Result "0..*" --> "1" Driver : associado a
     Driver "0..*" --> "1" Team : pertence a
-    Driver "0..*" -> "1" Driver
+    Result "1" --> "0..*" PitStop : gera

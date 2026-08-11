@@ -11,3 +11,7 @@ class Result(Base):
     drive_id: Mapped[int]
     position: Mapped[int]
     points: Mapped[int]
+    pitstops: Mapped[list["PitStop"]] = relationship(
+        back_populates="result",
+        cascade="all, delete-orphan",
+    )

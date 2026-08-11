@@ -1,5 +1,5 @@
 # RaceHub 
-### É uma plataforma de dados, com uma API servindo os dados desenvolvida em FastAPI para disponibilizar informações sobre a Fórmula 1.
+### É uma plataforma de dados, com uma API servindo os dados desenvolvida em FastAPI para disponibilizar informações sobre a Fórmula 1🏎️.
 
 De início a plataforma permitirá consultar:
 
@@ -12,17 +12,19 @@ De início a plataforma permitirá consultar:
 
 No futuro a plataforma terá:
 
-- Paginação
+- Paginação, filtros e ordenação
 - Estatísticas
-- Login
+- Login, roles
+- Autenticação (JWT, OAuth2, Password hash, etc)
 - Favoritos
 - Coleta de dados separado
 - ETL
-- Predições
+- Predições(Random Forest ou XGBoost pra prever pódio ou pontuação)
 - Dashboard
 - Variáveis de ambiente para credenciais.
 - Redis
 - Nginx
+- Streamlit ou um dashboard em react para visualizar estatísticas
 
 ## Atualizando dados sobre as corridas:
 Como ideia de atualização dos dados, como corridas, temporadas e etc. Puxar os dados de um site atualizado (ESPN por exemplo)-> fazendo um web scraping, ou puxar de alguma API que contenha os dados.

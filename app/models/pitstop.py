@@ -11,5 +11,5 @@ class PitStop(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     duration: Mapped[Interval]
 
-    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"))
-    team: Mapped["Team"] = relationship(back_populates="pitstops")
+    result_id: Mapped[int] = mapped_column(ForeignKey("results.id"))
+    result: Mapped["Result"] = relationship(back_populates="pitstops")

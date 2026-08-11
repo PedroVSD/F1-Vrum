@@ -1,64 +1,64 @@
 classDiagram
-    direction LR
+direction LR
 
-    class Season {
-        +int id
-        +int year
-    }
+class Season {
+    +int id
+    +int year
+}
 
-    class Race {
-        +int id
-        +string name
-        +int circuit_id
-        +int season_id
-        +date date
-    }
+class Race {
+    +int id
+    +string name
+    +int circuit_id
+    +int season_id
+    +date date
+}
 
-    class Circuit {
-        +int id
-        +string name
-        +string country
-        +string city
-        +float length_km
-    }
+class Circuit {
+    +int id
+    +string name
+    +string country
+    +string city
+    +float length_km
+}
 
-    class Result {
-        +int id
-        +int race_id
-        +int driver_id
-        +int position
-        +float points
-    }
+class Driver {
+    +int id
+    +string first_name
+    +string last_name
+    +int number
+    +string nationality
+    +date birth_date
+}
 
-    class Driver {
-        +int id
-        +string first_name
-        +string last_name
-        +int number
-        +string nationality
-        +date birth_date
-        +int team_id
-    }
+class Team {
+    +int id
+    +string name
+    +string country
+    +string principal
+    +string engine
+    +string car
+}
 
-    class Team {
-        +int id
-        +string name
-        +string country
-        +string principal
-        +string engine
-        +string car
-        +list drivers
-    }
+class RaceResult {
+    +int id
+    +int race_id
+    +int driver_id
+    +int team_id
+    +int position
+    +float points
+}
 
-    class PitStop {
-        +int id
-        +duration interval
-        +int result_id
-    }
+class PitStop {
+    +int id
+    +int result_id
+    +int stop_number
+    +duration duration
+}
 
-    Season "1" --> "0..*" Race : contém
-    Race "0..*" --> "1" Circuit : realizada em
-    Race "1" --> "0..*" Result : gera
-    Result "0..*" --> "1" Driver : associado a
-    Driver "0..*" --> "1" Team : pertence a
-    Result "1" --> "0..*" PitStop : gera
+Season "1" --> "0..*" Race : contains
+Circuit "1" --> "0..*" Race : hosts
+Race "1" --> "0..*" RaceResult : has
+Driver "1" --> "0..*" RaceResult : has
+Team "1" --> "0..*" RaceResult : has
+RaceResult "1" --> "0..*" PitStop : has

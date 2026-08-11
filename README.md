@@ -39,11 +39,14 @@ Como ideia de atualização dos dados, como corridas, temporadas e etc. Puxar os
 
 # Rodando o projeto
 
-- uv venv
-- source .venv/bin/activate
-- uv run uvicorn app.main:app --reload
-- http://127.0.0.1:8000
-- Caso o comando acima falhar: uv run python -m uvicorn app.main:app --reload
+```python
+uv venv
+source .venv/bin/activate
+uv run uvicorn app.main:app --reload
+http://127.0.0.1:8000
+#Caso o comando acima falhar:
+uv run python -m uvicorn app.main:app --reload
+```
 
 - Para conectar em um provedor de API como insomina:
 http://127.0.0.1:8000/openapi.json
@@ -54,7 +57,7 @@ http://127.0.0.1:8000/docs
 # Arquitetura planejada(pode mudar)
 
 ## Endpoints
-#### Escrever descrições claras nos endpoints desde o início.
+
 - GET /drivers
 - GET /drivers{id}
 - POST /driver
@@ -76,5 +79,6 @@ http://127.0.0.1:8000/docs
 
 # Como boas práticas:
 - Ir documentando
+- Escrever descrições claras nos endpoints desde o início
 - Separar responsabilidades
 - Testes

@@ -50,8 +50,14 @@ classDiagram
         +list drivers
     }
 
+    class PitStop {
+        +int id
+        +duration Interval
+    }
+
     Season "1" --> "0..*" Race : contém
     Race "0..*" --> "1" Circuit : realizada em
     Race "1" --> "0..*" Result : gera
     Result "0..*" --> "1" Driver : associado a
     Driver "0..*" --> "1" Team : pertence a
+    Driver "0..*" -> "1" Driver

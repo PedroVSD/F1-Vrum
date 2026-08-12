@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.race_result import RaceResult
+
 from .base import Base
 
 
@@ -12,5 +14,4 @@ class Team(Base):
     principal: Mapped[str]
     engine: Mapped[str]
     car: Mapped[str]
-
-    drivers: Mapped[list["Driver"]] = relationship(back_populates="team")
+    results: Mapped[list["RaceResult"]] = relationship(back_populates="team")

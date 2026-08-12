@@ -4,9 +4,9 @@ from .base import Base
 
 
 class Circuit(Base):
-    __tablename__ = "circuit"
+    __tablename__ = "circuits"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     country: Mapped[str]
     city: Mapped[str]

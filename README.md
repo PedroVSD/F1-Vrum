@@ -12,6 +12,7 @@ De início a plataforma permitirá consultar:
 
 No futuro a plataforma terá:
 
+- Automação para informar horários, pódios etc. Provavelmente usando n8n ou algo do tipo
 - Paginação, filtros e ordenação
 - Estatísticas
 - Login, roles

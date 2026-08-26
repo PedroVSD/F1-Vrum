@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 
+from app.routers.weekend import router as weekend_router
 
-app = FastAPI()
+app = FastAPI(
+    title="RaceHub - F1 API",
+    description="API de Fórmula 1 com módulo de atualizações de fim de semana (treinos/sprint/quali/corrida) via Ollama Cloud + email/telegram",
+    version="0.2.0",
+)
+
+# Módulo isolado: fim de semana de corrida (não altera rotas existentes)
+app.include_router(weekend_router)
+
 
 @app.get("/")
 def home():
@@ -23,3 +32,4 @@ def teams():
 
 @app.get("/circuits")
 def circuits():
+    return ["Monza", "Interlagos", "Silverstone"]

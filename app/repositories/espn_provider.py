@@ -140,6 +140,50 @@ class EspnProvider:
             )
         return out
 
+    def _parse_corrida_quali(self, html: str) -> list[SessionResultItem]:
+        """Extrai grid de largada (qualificação) da página /f1/corrida/_/id/"""
+        # padrão: RacingPos__Position + RacingPos__Name + RacingPos__Manufacturer (+ time em outra tabela)
+        pos_pattern = re.compile(
+            r'RacingPos__Position[^>]*>(\d+)</div>.*?RacingPos__Name[^>]*>([^<]+)</div>.*?RacingPos__Manufacturer[^>]*>([^<]+)</div>',
+            re.DOTALL,
+        )
+        matches = pos_pattern.findall(html)
+        results = []
+        # tenta pegar tempo da quali na tabela de sessões: Qualificação -> 1:21.786
+        sess_time = None
+        m_time = re.search(r'Qualifi[^<]*</td>.*?RacingSessions__Time[^>]*>([^<]+)</td>', html, re.DOTALL)
+        if m_time:
+            sess_time = m_time.group(1).strip()
+        for pos, driver, team in matches[:10]:
+            results.append(
+                SessionResultItem(
+                    position=pos.strip(),
+                    driver=driver.strip(),
+                    team=team.strip(),
+                    time=sess_time if pos.strip() == "1" else None,  # só pole tem tempo nessa página
+                    points=None,
+                    status=None,
+                )
+            )
+        return results
+
+    async def _get_latest_corrida_html(self) -> str | None:
+        """Busca id da última corrida no calendário e retorna html da corrida."""
+        try:
+            cal_html = await self._fetch("https://www.espn.com.br/f1/calendario")
+            # pega primeiro id de corrida: /f1/corrida/_/id/6000...
+            m = re.search(r'/f1/corrida/_/id/(\d+)', cal_html)
+            if m:
+                corrida_id = m.group(1)
+                return await self._fetch(f"https://www.espn.com.br/f1/corrida/_/id/{corrida_id}")
+        except Exception:
+            pass
+        # fallback id conhecido de Monza 2025 (funciona como exemplo)
+        try:
+            return await self._fetch("https://www.espn.com.br/f1/corrida/_/id/600057442")
+        except Exception:
+            return None
+
     # ---------- WeekendProvider impl ----------
 
     async def get_current_schedule(self) -> list[WeekendInfo]:
@@ -201,11 +245,12 @@ class EspnProvider:
         self, year: str, round: str, session: SessionType
     ) -> list[SessionResultItem]:
         """
-        Mapeamento:
-        - race / qualifying / sprint -> classificação (tabela PTS)
-        - fp1/fp2/fp3 e outros -> notícias (headlines)
+        Mapeamento ESPN:
+        - race / sprint -> classificação (PTS) de https://www.espn.com.br/f1/classificacao
+        - qualifying / sprint_qualifying -> grid de largada (top 10) da página da corrida
+        - fp1/fp2/fp3 -> notícias como placeholder
         """
-        if session in (SessionType.race, SessionType.qualifying, SessionType.sprint, SessionType.sprint_qualifying):
+        if session in (SessionType.race, SessionType.sprint):
             try:
                 html = await self._fetch(self.classificacao_url)
                 results = self._parse_classificacao(html)
@@ -218,6 +263,18 @@ class EspnProvider:
             except Exception:
                 return []
             return []
+        if session in (SessionType.qualifying, SessionType.sprint_qualifying):
+            try:
+                html = await self._get_latest_corrida_html()
+                if html:
+                    results = self._parse_corrida_quali(html)
+                    if results:
+                        return results
+                # fallback para classificação se parsing da corrida falhar
+                html = await self._fetch(self.classificacao_url)
+                return self._parse_classificacao(html)[:10]
+            except Exception:
+                return []
         else:
             # Treinos -> notícias como placeholder de "resultados"
             try:

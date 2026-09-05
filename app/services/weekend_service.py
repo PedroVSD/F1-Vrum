@@ -3,15 +3,31 @@ Orquestrador: ingest -> LLM -> notify
 """
 
 from app.core.config import get_settings
+from app.repositories.espn_provider import EspnProvider
+from app.repositories.openf1_provider import OpenF1Provider
 from app.repositories.weekend_provider import JolpicaProvider, build_raw_message
 from app.schemas.weekend import NotifyRequest, NotifyResponse, WeekendInfo
 from app.services.llm_service import OllamaClient
 from app.services.notify_service import EmailNotifier, TelegramNotifier
 
 
+def get_provider(name: str | None = None):
+    s = get_settings()
+    provider_name = (name or s.weekend_provider or "jolpica").lower().strip()
+    if provider_name in ("espn", "espn_provider", "espn_standings", "espn_news"):
+        return EspnProvider(
+            classificacao_url=s.espn_classificacao_url,
+            f1_url=s.espn_f1_url,
+        )
+    if provider_name in ("openf1", "open_f1"):
+        return OpenF1Provider(base_url=s.openf1_base_url)
+    # default jolpica + aliases
+    return JolpicaProvider(base_url=s.jolpica_base_url)
+
+
 async def process_weekend(request: NotifyRequest) -> NotifyResponse:
     settings = get_settings()
-    provider = JolpicaProvider(base_url=settings.jolpica_base_url)
+    provider = get_provider(request.provider or settings.weekend_provider)
 
     if request.year and request.round:
         year, round_ = request.year, request.round
@@ -69,13 +85,11 @@ async def process_weekend(request: NotifyRequest) -> NotifyResponse:
     )
 
 
-async def get_next_weekend_info() -> WeekendInfo:
-    s = get_settings()
-    provider = JolpicaProvider(base_url=s.jolpica_base_url)
+async def get_next_weekend_info(provider_name: str | None = None) -> WeekendInfo:
+    provider = get_provider(provider_name)
     return await provider.get_next_weekend()
 
 
-async def get_schedule() -> list[WeekendInfo]:
-    s = get_settings()
-    provider = JolpicaProvider(base_url=s.jolpica_base_url)
+async def get_schedule(provider_name: str | None = None) -> list[WeekendInfo]:
+    provider = get_provider(provider_name)
     return await provider.get_current_schedule()

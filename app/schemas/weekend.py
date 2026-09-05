@@ -73,6 +73,10 @@ class NotifyRequest(BaseModel):
     channels: list[str] | None = Field(
         default=None, description="Canais: email, telegram. Default = todos configurados"
     )
+    provider: str | None = Field(
+        default=None,
+        description="Provider: jolpica (default), espn, openf1. Sobrescreve WEEKEND_PROVIDER do .env",
+    )
 
 
 class NotifyResponse(BaseModel):

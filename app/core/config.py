@@ -13,6 +13,8 @@ class WeekendSettings(BaseSettings):
     espn_classificacao_url: str = "https://www.espn.com.br/f1/classificacao"
     espn_f1_url: str = "https://www.espn.com.br/f1/"
     openf1_base_url: str = "https://api.openf1.org/v1"
+    globo_home_url: str = "https://ge.globo.com/motor/formula-1/"
+    globo_calendario_url: str = "https://ge.globo.com/motor/formula-1/noticia/2026/03/14/f1-2026-veja-como-fica-calendario-sem-gps-do-bahrein-e-arabia-saudita.ghtml"
 
     # --- Ollama Cloud ---
     ollama_api_key: str | None = None

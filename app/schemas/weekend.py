@@ -75,7 +75,7 @@ class NotifyRequest(BaseModel):
     )
     provider: str | None = Field(
         default=None,
-        description="Provider: jolpica (default), espn, openf1. Sobrescreve WEEKEND_PROVIDER do .env",
+        description="Provider: jolpica (default), espn, openf1, all (síntese multi-fonte). Aceita lista separada por vírgula: 'jolpica,espn,openf1'",
     )
 
 

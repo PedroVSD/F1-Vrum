@@ -39,6 +39,8 @@ Como ideia de atualização dos dados, como corridas, temporadas e etc. Puxar os
 - Pydantic
 - Docker Compose
 - Uvicorn
+- BeautifulSoup4 + lxml (scraping ESPN / ge.globo)
+- httpx
 
 # Rodando o projeto
 
@@ -52,26 +54,29 @@ uv run uvicorn app.main:app --reload
 uv run python -m uvicorn app.main:app --reload
 ```
 
-## Módulo: Atualizações de fim de semana de corrida (NOVO)
+## Módulo: Atualizações de fim de semana de corrida
 
 Fluxo isolado que respeita a estrutura existente do projeto (`routers/services/schemas/core/repositories`):
 
 ```
-Sites de esporte (Jolpica F1 API) -> API interna -> Ollama Cloud (LLM edita msg) -> Email/Telegram
+Jolpica (Ergast) + ESPN Brasil + ge.globo + OpenF1 -> síntese multi-fonte (provider=all) -> API interna -> Ollama Cloud (LLM edita/sintetiza msg) -> Email/Telegram
 ```
 
-Cobre: **Treinos (FP1/FP2/FP3), Sprint, Qualificação e Corrida.**
+Cobre: **Treinos (FP1/FP2/FP3), Sprint, Qualificação e Corrida.** Suporta `provider=jolpica|espn|globo|openf1|all` ou lista `jolpica,espn,globo`.
 
 ### Arquitetura (seguindo padrão FastAPI do projeto)
 
 ```
 app/core/config.py              -> WeekendSettings (lê .env via pydantic-settings)
-app/schemas/weekend.py          -> SessionType, WeekendInfo, NotifyRequest/Response
-app/repositories/weekend_provider.py -> JolpicaProvider (adapter para trocar por ESPN/OpenF1)
+app/schemas/weekend.py          -> SessionType, WeekendInfo, NotifyRequest/Response (provider=jolpica|espn|globo|openf1|all)
+app/repositories/weekend_provider.py -> JolpicaProvider (Ergast)
+app/repositories/espn_provider.py    -> EspnProvider (https://www.espn.com.br/f1/classificacao + https://www.espn.com.br/f1/)
+app/repositories/globo_provider.py   -> GloboProvider (https://ge.globo.com/motor/formula-1/)
+app/repositories/openf1_provider.py  -> OpenF1Provider (https://api.openf1.org/v1)
 app/services/llm_service.py     -> OllamaClient (https://ollama.com/api/chat) com fallback
 app/services/notify_service.py  -> EmailNotifier (SMTP) + TelegramNotifier (Bot API)
-app/services/weekend_service.py -> orquestra ingest -> llm -> notify
-app/routers/weekend.py          -> endpoints FastAPI (/weekend/*)
+app/services/weekend_service.py -> orquestra ingest (get_providers/build_multi_source_raw) -> llm -> notify (suporta síntese multi-fonte)
+app/routers/weekend.py          -> endpoints FastAPI (/weekend/* ?provider=all)
 ```
 
 **Fallbacks:** sem `OLLAMA_API_KEY` envia mensagem bruta; sem SMTP/Telegram apenas reporta `configured: false`; sem resultados ainda, envia grade de horários.
@@ -89,6 +94,11 @@ Variáveis principais (ver `.env.example`):
 
 | Var | Descrição |
 |-----|-----------|
+| `WEEKEND_PROVIDER` | `jolpica` (default) \| `espn` \| `globo` \| `openf1` \| `all` (síntese 4 fontes) ou lista `jolpica,espn,globo` |
+| `JOLPICA_BASE_URL` | default `https://api.jolpi.ca/ergast/f1` |
+| `ESPN_CLASSIFICACAO_URL` / `ESPN_F1_URL` | `https://www.espn.com.br/f1/classificacao` e `https://www.espn.com.br/f1/` |
+| `GLOBO_HOME_URL` / `GLOBO_CALENDARIO_URL` | `https://ge.globo.com/motor/formula-1/` e artigo de calendário |
+| `OPENF1_BASE_URL` | default `https://api.openf1.org/v1` |
 | `OLLAMA_API_KEY` | Key do https://ollama.com/settings/keys |
 | `OLLAMA_MODEL` | default `llama3.1:8b` |
 | `SMTP_HOST/PORT/USER/PASSWORD/TO` | SMTP para email |
@@ -98,33 +108,43 @@ Variáveis principais (ver `.env.example`):
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/weekend/health` | Confere se LLM/email/telegram estão configurados |
-| GET | `/weekend/next` | Próxima corrida (circuito, data, horários) |
-| GET | `/weekend/schedule` | Calendário completo da temporada |
-| GET | `/weekend/preview?session_type=qualifying` | Mensagem bruta sem LLM/sem envio |
-| POST | `/weekend/notify` | Pipeline completo (ingest -> LLM -> envio) |
+| GET | `/weekend/health` | Confere se LLM/email/telegram e providers estão configurados |
+| GET | `/weekend/next?provider=globo` | Próxima corrida (aceita `jolpica`\|`espn`\|`globo`\|`openf1`\|`all`) |
+| GET | `/weekend/schedule?provider=all` | Calendário completo (sintetiza 4 fontes se `all`) |
+| GET | `/weekend/preview?session_type=qualifying&provider=espn` | Mensagem bruta sem LLM/sem envio (use `fp1` para notícias) |
+| POST | `/weekend/notify` | Pipeline completo (ingest -> LLM síntese -> envio), aceita `provider` |
 
 Exemplos:
 
 ```bash
-# saúde
-curl http://127.0.0.1:8000/weekend/health
+# saúde (mostra providers)
+curl http://127.0.0.1:8000/weekend/health | jq
 
-# próxima corrida
-curl http://127.0.0.1:8000/weekend/next
+# próxima corrida — por provider
+curl "http://127.0.0.1:8000/weekend/next?provider=jolpica" | jq
+curl "http://127.0.0.1:8000/weekend/next?provider=globo" | jq
+curl "http://127.0.0.1:8000/weekend/next?provider=all" | jq
 
-# prévia sem envio
-curl "http://127.0.0.1:8000/weekend/preview?session_type=race&year=2024&round=1"
+# prévia sem envio — notícias vs classificação
+curl "http://127.0.0.1:8000/weekend/preview?session_type=fp1&provider=espn" | jq # notícias ESPN
+curl "http://127.0.0.1:8000/weekend/preview?session_type=fp1&provider=globo" | jq # notícias ge.globo
+curl "http://127.0.0.1:8000/weekend/preview?session_type=qualifying&provider=espn" | jq # grid top10
+curl "http://127.0.0.1:8000/weekend/preview?session_type=race&provider=all" | jq # síntese 4 fontes
 
 # pipeline completo (dry_run para testar sem enviar)
 curl -X POST http://127.0.0.1:8000/weekend/notify \
   -H "Content-Type: application/json" \
-  -d '{"session_type":"qualifying","dry_run":true}'
+  -d '{"session_type":"qualifying","provider":"all","dry_run":true}' | jq
 
-# envio real para canais configurados
+# envio real — single provider
 curl -X POST http://127.0.0.1:8000/weekend/notify \
   -H "Content-Type: application/json" \
-  -d '{"session_type":"race","channels":["telegram"]}'
+  -d '{"session_type":"race","provider":"globo","channels":["telegram"]}' | jq
+
+# envio real — síntese multi-fonte (recomendado)
+curl -X POST http://127.0.0.1:8000/weekend/notify \
+  -H "Content-Type: application/json" \
+  -d '{"session_type":"fp1","provider":"all","channels":["telegram"]}' | jq
 
 # via swagger: http://127.0.0.1:8000/docs
 ```
@@ -138,7 +158,7 @@ O módulo é stateless. Para receber todo fim de semana automaticamente, agende 
 
 ### Trocar fonte de dados
 
-Implemente `WeekendProvider` em `app/repositories/weekend_provider.py` (ex: `EspnScraper`, `OpenF1Provider`) e injete em `app/services/weekend_service.py`. Nenhum outro arquivo precisa mudar.
+Implemente `WeekendProvider` (ex: `EspnProvider`, `GloboProvider`, `OpenF1Provider`) em `app/repositories/` e registre em `app/services/weekend_service.py:14` (`get_provider`/`get_providers`). Use `?provider=globo` ou `provider=all` para síntese multi-fonte (Jolpica+ESPN+globo+OpenF1 → LLM sintetiza). Nenhum outro arquivo precisa mudar.
 
 - Para conectar em um provedor de API como insomina:
 http://127.0.0.1:8000/openapi.json
